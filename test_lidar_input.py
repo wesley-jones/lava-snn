@@ -3,12 +3,14 @@
 import zmq
 import time
 import numpy as np
+from config_utils import get_port_from_config
 
 
 def main():
+    port = get_port_from_config("lidar_sensor")
     context = zmq.Context()
     socket = context.socket(zmq.PUB)
-    socket.bind("tcp://*:5555")
+    socket.bind(f"tcp://*:{port}")
 
     while True:
         # Simulate lidar data

@@ -2,29 +2,30 @@ import zmq
 import numpy as np
 from lava.magma.core.process.ports.ports import InPort
 from lava.magma.core.process.process import AbstractProcess
-from lava.magma.core.process.variable import Var
 from lava.magma.core.model.py.model import PyLoihiProcessModel
 from lava.magma.core.model.py.ports import PyInPort
 from lava.magma.core.decorator import implements, requires
 from lava.magma.core.sync.protocols.loihi_protocol import LoihiProtocol
 from lava.magma.core.resources import CPU
 from lava.magma.core.model.py.type import LavaPyType
+from config_utils import get_port_from_config
 
-class PublisherNode(AbstractProcess):
+class VelocityOutputNode(AbstractProcess):
     def __init__(self):
         super().__init__()
-        self.s_in = InPort(shape=(1,))  # Listen to 4 output neurons
+        self.s_in = InPort(shape=(1,))
 
-@implements(proc=PublisherNode, protocol=LoihiProtocol)  # Link ProcessModel to PublisherNode
+@implements(proc=VelocityOutputNode, protocol=LoihiProtocol)  # Link ProcessModel to PublisherNode
 @requires(CPU)  # Specify that this ProcessModel runs on the CPU
-class PublisherNodeModel(PyLoihiProcessModel):
+class VelocityOutputNodeModel(PyLoihiProcessModel):
     s_in: PyInPort = LavaPyType(PyInPort.VEC_DENSE, bool, precision=1)  # Input port declaration
 
     def __init__(self, proc_params):
         super().__init__(proc_params)
+        port = get_port_from_config("velocity_command")
         self.socket = zmq.Context().socket(zmq.PUB)
         self.socket.setsockopt(zmq.SNDHWM, 1)  # Set the send high-water mark to 1
-        self.socket.bind("tcp://*:5556")
+        self.socket.bind(f"tcp://*:{port}")
         self.count = 0
         print(f"Counter: {self.count}")
 

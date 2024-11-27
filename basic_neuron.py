@@ -35,9 +35,7 @@ class BasicNeuronModel(PyLoihiProcessModel):
 
     def run_spk(self):
         # Non-blocking check for input
-        # print("BasicNeuron.run_spk")
         if self.s_in.probe() is True:
-            print("recv() method is about to run")
             input_spikes = self.s_in.recv()
             print(f"BasicNeuron received spikes: {input_spikes}")
             fire_spike = np.any(input_spikes)  # Fire if any input is True

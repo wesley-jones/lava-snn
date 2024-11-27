@@ -1,12 +1,13 @@
 # read_snn_output.py
 
 import zmq
-
+from config_utils import get_port_from_config
 
 def main():
+    port = get_port_from_config("velocity_command")
     context = zmq.Context()
     socket = context.socket(zmq.SUB)
-    socket.connect("tcp://localhost:5556")  # Connect to the SNN's publisher port
+    socket.connect(f"tcp://localhost:{port}")  # Connect to the SNN's publisher port
     socket.setsockopt_string(zmq.SUBSCRIBE, "")  # Subscribe to all messages
 
     print("Listening for SNN output...")
